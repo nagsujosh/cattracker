@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CatTracker</title>
+    <link rel="stylesheet" href="../static/css/settings.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="icon" href="../static/assets/logo.png" type="image/x-icon">
+</head>
+<body>
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+            <span class="close-btn">&times;</span> <!-- Cross button to close -->
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="../static/assets/logo.png" alt="CatTracker Logo" class="logo-icon">
+            <h1>CatTracker</h1>
+        </div>
+        <nav class="menu">
+            <a href="home" class="menu-item">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="lost" class="menu-item">
+                <i class="fas fa-search"></i> Lost Item
+            </a>
+            <a href="found" class="menu-item">
+                <i class="fas fa-eye"></i> Found Item
+            </a>
+            <a href="claim" class="menu-item">
+                <i class="fas fa-handshake"></i> Claim Item
+            </a>
+            <a href="settings" class="menu-item active">
+                <i class="fas fa-gear"></i> Profile
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+        <header class="main-header">
+            <div class="search-bar">
+                <form method="GET" action="{{ url_for('search') }}">
+                    <input type="text" name="query" placeholder="Search for lost items..." required>
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <div class="header-actions">
+                <button class="button"><a href="/logout">Logout</a></button>
+            </div>
+        </header>
+
+        <div class="content">
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-messages">
+                {% for category, message in messages %}
+                <div class="flash flash-{{ category }}">
+                    <span class="close-btn">&times;</span> <!-- Cross button to close -->
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <div class="forms">
+            <!-- Profile Photo Section -->
+            <div class="profile-photo-section">
+                <h2>Profile Photo</h2>
+                <img src="{{ user.photo if user.photo else url_for('static', filename='assets/dummy.png') }}"
+                     alt="Profile Photo" class="profile-photo">
+                <form method="POST" action="{{ url_for('settings') }}" enctype="multipart/form-data">
+                    <input type="file" name="profile_photo" accept="image/*" required>
+                    <input type="hidden" name="action" value="upload_photo">
+                    <button type="submit">Upload Photo</button>
+                </form>
+            </div>
+
+            <hr class="hr">
+
+            <form class="profile-form" method="POST" action="{{ url_for('settings') }}">
+                <h2>Update Community Profile</h2>
+                <p>Current First Name: {{ user.first_name }}</p>
+                <p>Current Last Name: {{ user.last_name }}</p>
+
+                <label for="firstName">First Name</label>
+                <input type="text" id="firstName" name="firstName" value="{{ user.first_name }}" required>
+
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName" value="{{ user.last_name }}" required>
+
+                <input type="hidden" name="action" value="profile">
+                <button type="submit">Update Profile</button>
+            </form>
+
+            <hr class="hr">
+
+            <form class="profile-form" method="POST" action="{{ url_for('settings') }}">
+                <h2>Update Email & Username</h2>
+                <p>Current Email: {{ user.email }}</p>
+                <p>Current Username: {{ user.username }}</p>
+
+                <label for="newEmail">New Email</label>
+                <input type="text" id="newEmail" name="newEmail" value="{{ user.email }}" required>
+
+                <label for="newUsername">New Username</label>
+                <input type="text" id="newUsername" name="newUsername" value="{{user.username}}" required>
+
+                <input type="hidden" name="action" value="email_username">
+                <button type="submit">Update Email & Username</button>
+            </form>
+
+            <hr class="hr">
+
+            <form class="profile-form" method="POST" action="{{ url_for('settings') }}">
+                <h2>Update Password</h2>
+
+                <label for="currentPassword">Old Password</label>
+                <input type="password" id="currentPassword" name="currentPassword" required>
+
+                <label for="newPassword">New Password</label>
+                <input type="password" id="newPassword" name="newPassword" required>
+
+                <input type="hidden" name="action" value="password">
+                <button type="submit">Update Password</button>
+            </form>
+
+            <hr class="hr">
+
+            <form class="profile-form" method="POST" action="{{ url_for('user_delete', user_id=user.id) }}">
+                <h2>Delete User</h2>
+                <label for="confirmUserId">Type your username to delete your account</label>
+                <input type="text" id="confirmUserId" name="confirm_username" required>
+                <button type="submit">Delete User</button>
+            </form>
+        </div>
+    </main>
+</div>
+<script>
+    window.onload = function () {
+        const closeButtons = document.querySelectorAll('.close-btn');
+        const flashMessages = document.querySelectorAll('.flash');
+
+        // Add event listener for the close button
+        closeButtons.forEach((button, index) => {
+            button.addEventListener('click', function (event) {
+                const flashMessage = event.target.closest('.flash');
+                closeFlashMessage(flashMessage);
+            });
+
+            // Set timeout for each flash message
+            setTimeout(() => {
+                if (flashMessages[index]) {
+                    closeFlashMessage(flashMessages[index]);
+                }
+            }, 5000); // 7 seconds timeout
+        });
+    };
+
+    function closeFlashMessage(flashMessage) {
+        flashMessage.style.opacity = 0;  // Fade out the message
+        setTimeout(() => {
+            flashMessage.remove();  // Remove the message after fade-out
+        }, 500);  // Match the fade-out time
+    }
+</script>
+</body>
+</html>

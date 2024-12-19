@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CatTracker</title>
+    <link rel="stylesheet" href="../static/css/home.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="icon" href="../static/assets/logo.png" type="image/x-icon">
+</head>
+<body>
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+            <span class="close-btn">&times;</span> <!-- Cross button to close -->
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="../static/assets/logo.png" alt="CatTracker Logo" class="logo-icon">
+            <h1>CatTracker</h1>
+        </div>
+        <nav class="menu">
+            <a href="home" class="menu-item active">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="lost" class="menu-item">
+                <i class="fas fa-search"></i> Lost Item
+            </a>
+            <a href="found" class="menu-item">
+                <i class="fas fa-eye"></i> Found Item
+            </a>
+            <a href="claim" class="menu-item">
+                <i class="fas fa-handshake"></i> Claim Item
+            </a>
+            <a href="settings" class="menu-item">
+                <i class="fas fa-gear"></i> Profile
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+        <header class="main-header">
+            <div class="search-bar">
+                <form method="GET" action="{{ url_for('search') }}">
+                    <input type="text" name="query" placeholder="Search for lost items..." required>
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <div class="header-actions">
+                <button class="button"><a href="/logout">Logout</a></button>
+            </div>
+        </header>
+
+        <section class="content">
+            <h2>Community Claimed Tickets</h2>
+            <p>Track items you've claimed, review lost and found tickets you've posted, and see what others have
+                successfully claimed from you.</p>
+
+            <div class="tabs">
+                <button class="tab"><a href="home">Lost</a></button>
+                <button class="tab"><a href="home-found">Found</a></button>
+                <button class="tab active"><a href="home-claim">Claim</a></button>
+            </div>
+
+            <!-- Claimed Tickets Section -->
+            <div id="claimed-tickets-section" class="tickets-section">
+                <h1>Claimed Tickets</h1>
+                {% set claimed_tickets = [] %}
+                {% if tickets %}
+                <div class="ticket-list">
+                    {% for ticket in tickets['tickets'] %}
+                    {% if ticket.claimed %}
+                    {% set _ = claimed_tickets.append(ticket) %}
+                    <div class="ticket-card">
+                        <h3>{{ ticket.lost_item }}</h3>
+                        <p><i class="fas fa-map-marker-alt"></i> Location: {{ ticket.location }}</p>
+                        <p><i class="fas fa-info-circle"></i> Description: {{ ticket.description }}</p>
+                        <p><i class="fas fa-calendar-alt"></i> {{ 'Date Lost' if ticket.lost else 'Date Found' }}: {{
+                            ticket.date|format_datetime }}</p>
+                        <p><i class="fas fa-calendar-alt"></i> Date posted: {{ ticket.issue_date|format_datetime }}</p>
+                        <p>
+                            <i class="fas fa-check-circle {{ 'claimed-icon' if ticket.claimed else 'not-claimed-icon' }}"></i>
+                            Claimed: {{ 'Yes' if ticket.claimed else 'No' }}
+                        </p>
+                        <p class="posted-by">
+                            <i class="fas fa-user"></i> Posted By {{ ticket.user_id }}
+                        </p>
+                        <p><i class="fas fa-check-circle"></i> Claimed: {{ ticket.claimed }}</p>
+                        {% if ticket.photo_url %}
+                        <img src="{{ ticket.photo_url }}" alt="Photo of {{ ticket.lost_item }}" class="ticket-photo">
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if claimed_tickets|length == 0 %}
+                <p class="no-tickets">No claimed tickets found.</p>
+                {% endif %}
+            </div>
+
+        </section>
+    </main>
+</div>
+<script>
+    window.onload = function () {
+        const closeButtons = document.querySelectorAll('.close-btn');
+        const flashMessages = document.querySelectorAll('.flash');
+
+        // Add event listener for the close button
+        closeButtons.forEach((button, index) => {
+            button.addEventListener('click', function (event) {
+                const flashMessage = event.target.closest('.flash');
+                closeFlashMessage(flashMessage);
+            });
+
+            // Set timeout for each flash message
+            setTimeout(() => {
+                if (flashMessages[index]) {
+                    closeFlashMessage(flashMessages[index]);
+                }
+            }, 5000); // 5 seconds timeout
+        });
+    };
+
+    function closeFlashMessage(flashMessage) {
+        flashMessage.style.opacity = 0;  // Fade out the message
+        setTimeout(() => {
+            flashMessage.remove();  // Remove the message after fade-out
+        }, 500);  // Match the fade-out time
+    }
+</script>
+</body>
+</html>

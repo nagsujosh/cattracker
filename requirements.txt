@@ -1,0 +1,14 @@
+# Do not include azure-functions-worker in this file
+# The Python Worker is managed by the Azure Functions platform
+# Manually managing azure-functions-worker may cause unexpected issues
+
+azure-functions
+pymongo
+flask
+requests
+flask_login
+azure-storage-blob
+Flask
+Flask-Login
+requests
+sentence-transformers

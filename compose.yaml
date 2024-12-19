@@ -1,0 +1,8 @@
+services:
+  server:
+    build:
+      context: .
+    ports:
+      - 80:80
+    image: cattracker.azurecr.io/cattracker
+    platform: linux/amd64

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results</title>
+    <link rel="stylesheet" href="../static/css/search.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+    </style>
+</head>
+<body>
+<div class="container">
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="../static/assets/logo.png" alt="CatTracker Logo" class="logo-icon">
+            <h1>CatTracker</h1>
+        </div>
+        <nav class="menu">
+            <a href="home" class="menu-item"><i class="fas fa-home"></i> Home</a>
+            <a href="lost" class="menu-item"><i class="fas fa-search"></i> Lost Item</a>
+            <a href="found" class="menu-item"><i class="fas fa-eye"></i> Found Item</a>
+            <a href="claim" class="menu-item"><i class="fas fa-handshake"></i> Claim Item</a>
+            <a href="settings" class="menu-item"><i class="fas fa-gear"></i> Profile</a>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <header class="main-header">
+            <div class="search-bar">
+                <form method="GET" action="{{ url_for('search') }}">
+                    <input type="text" name="query" placeholder="Search for lost items..." required>
+                    <button type="submit"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+            <div class="header-actions">
+                <button class="button"><a href="/logout">Logout</a></button>
+            </div>
+        </header>
+
+        <div class="content">
+            <h2>Search Results for "{{ query }}"</h2>
+            {% if results %}
+            {% for result in results %}
+            <div class="ticket-card">
+                <div class="ticket-header">
+                    <h3>{{ result.lost_item }}</h3>
+                    <span class="badge {{ 'claimed' if result.claimed else 'unclaimed' }}">
+                            {{ 'Claimed' if result.claimed else 'Unclaimed' }}
+                        </span>
+                </div>
+
+                <div class="ticket-info">
+                    <p><strong>Location:</strong> {{ result.location }}</p>
+                    <p><strong>Description:</strong> {{ result.description }}</p>
+                    <p><strong>Issue Date:</strong> {{ result.issue_date|format_datetime }}</p>
+                    <p><strong>Status:</strong> {{ 'Active' if result.status else 'Closed' }}</p>
+                    <p><strong>Date Found:</strong> {{ result.date if result.date else 'Not yet found' }}</p>
+                    <p><strong>Claimed By:</strong> {{ result.claimer_id if result.claimer_id else 'Not Claimed' }}</p>
+                    {% if result.photo_url %}
+                    <div class="ticket-photo">
+                        <img src="{{ result.photo_url }}" alt="Photo of {{ result.lost_item }}">
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="no-results">No results found.</p>
+            {% endif %}
+        </div>
+    </main>
+</div>
+</body>
+</html>

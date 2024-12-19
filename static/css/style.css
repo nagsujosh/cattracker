@@ -1,0 +1,137 @@
+/* Base Styling */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #FF7F50, #1F64FF);
+    color: #ffffff;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    padding: 40px 20px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+    color: #333;
+}
+
+.logo {
+    width: 100px;
+    height: auto;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 2.5rem;
+    color: #FF7F50;
+    margin-bottom: 10px;
+}
+
+.tagline {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+.button {
+    background: linear-gradient(135deg, #1F64FF, #FF7F50);
+    color: #ffffff;
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: bold;
+    text-decoration: none;
+    border-radius: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0px 4px 10px rgba(31, 100, 255, 0.3);
+}
+
+.button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 8px 20px rgba(31, 100, 255, 0.5);
+}
+
+.button.secondary {
+    background: linear-gradient(135deg, #FF3C70, #FF7F50);
+}
+
+.button.secondary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 8px 20px rgba(255, 60, 112, 0.5);
+}
+
+/* Responsive Design */
+@media (max-width: 500px) {
+    .container {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .button {
+        width: 100%;
+    }
+}
+
+/* Flash Message Styles */
+.flash-messages {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    z-index: 9999;
+}
+
+.flash {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.5s ease-in-out;
+    position: relative; /* Make room for the close button */
+}
+
+.flash-success {
+    background-color: #4CAF50;
+}
+
+.flash-error {
+    background-color: #F44336;
+}
+
+.flash-info {
+    background-color: #2196F3;
+}
+
+.flash-warning {
+    background-color: #FF9800;
+}
+
+/* Cross Button Styling */
+.close-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 18px;
+    color: #fff;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.close-btn:hover {
+    color: #ccc;
+}

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to CatTracker</title>
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="icon" href="../static/assets/logo.png" type="image/x-icon">
+</head>
+<body>
+<div class="content">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+            <span class="close-btn">&times;</span> <!-- Cross button to close -->
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <img src="../static/assets/logo.png" alt="CatTracker Logo" class="logo">
+    <h1>Welcome to CatTracker</h1>
+    <p class="tagline">Your ultimate feline tracking companion 🐾</p>
+    <div class="container">
+        <a href="{{ url_for('signup') }}" class="button">Sign Up</a>
+        <a href="{{ url_for('login') }}" class="button secondary">Log In</a>
+    </div>
+</div>
+<script>
+    window.onload = function () {
+        const closeButtons = document.querySelectorAll('.close-btn');
+        const flashMessages = document.querySelectorAll('.flash');
+
+        // Add event listener for the close button
+        closeButtons.forEach((button, index) => {
+            button.addEventListener('click', function (event) {
+                const flashMessage = event.target.closest('.flash');
+                closeFlashMessage(flashMessage);
+            });
+
+            // Set timeout for each flash message
+            setTimeout(() => {
+                if (flashMessages[index]) {
+                    closeFlashMessage(flashMessages[index]);
+                }
+            }, 5000); // 7 seconds timeout
+        });
+    };
+
+    function closeFlashMessage(flashMessage) {
+        flashMessage.style.opacity = 0;  // Fade out the message
+        setTimeout(() => {
+            flashMessage.remove();  // Remove the message after fade-out
+        }, 500);  // Match the fade-out time
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CatTracker Sign Up</title>
+    <link rel="stylesheet" href="../static/css/signin.css">
+    <link rel="icon" href="../static/assets/logo.png" type="image/x-icon">
+</head>
+<body>
+<div class="content">
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+            <span class="close-btn">&times;</span> <!-- Cross button to close -->
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Signup Form -->
+    <form action="/signup" method="POST" class="form">
+        <h1>CatTracker Sign Up</h1>
+        <p class="tagline">Track your cats with style 🐾</p>
+        <div class="container">
+            <label for="first_name">First Name</label>
+            <input type="text" id="first_name" name="first_name" placeholder="Enter your first name" required>
+
+            <label for="last_name">Last Name</label>
+            <input type="text" id="last_name" name="last_name" placeholder="Enter your last name" required>
+
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" placeholder="Enter your username" required>
+
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="Enter your password" required>
+
+            <button type="submit" class="button">Sign Up</button>
+        </div>
+
+        <!-- Already have an account link -->
+        <div class="login-link">
+            <p>Already have an account? <a href="/login">Login</a></p>
+        </div>
+    </form>
+</div>
+
+<script>
+    window.onload = function () {
+        const closeButtons = document.querySelectorAll('.close-btn');
+        const flashMessages = document.querySelectorAll('.flash');
+
+        // Add event listener for the close button
+        closeButtons.forEach((button, index) => {
+            button.addEventListener('click', function (event) {
+                const flashMessage = event.target.closest('.flash');
+                closeFlashMessage(flashMessage);
+            });
+
+            // Set timeout for each flash message
+            setTimeout(() => {
+                if (flashMessages[index]) {
+                    closeFlashMessage(flashMessages[index]);
+                }
+            }, 5000); // 7 seconds timeout
+        });
+    };
+
+    function closeFlashMessage(flashMessage) {
+        flashMessage.style.opacity = 0;  // Fade out the message
+        setTimeout(() => {
+            flashMessage.remove();  // Remove the message after fade-out
+        }, 500);  // Match the fade-out time
+    }
+</script>
+
+</body>
+</html>

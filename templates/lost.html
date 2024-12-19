@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CatTracker</title>
+    <link rel="stylesheet" href="../static/css/lost.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="icon" href="../static/assets/logo.png" type="image/x-icon">
+</head>
+<body>
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">
+            <span class="close-btn">&times;</span> <!-- Cross button to close -->
+            {{ message }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <img src="../static/assets/logo.png" alt="CatTracker Logo" class="logo-icon">
+            <h1>CatTracker</h1>
+        </div>
+        <nav class="menu">
+            <a href="home" class="menu-item">
+                <i class="fas fa-home"></i> Home
+            </a>
+            <a href="lost" class="menu-item active">
+                <i class="fas fa-search"></i> Lost Item
+            </a>
+            <a href="found" class="menu-item">
+                <i class="fas fa-eye"></i> Found Item
+            </a>
+            <a href="claim" class="menu-item">
+                <i class="fas fa-handshake"></i> Claim Item
+            </a>
+            <a href="settings" class="menu-item">
+                <i class="fas fa-gear"></i> Profile
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+        <header class="main-header">
+            <div class="header-actions">
+                <button class="button"><a href="/logout">Logout</a></button>
+            </div>
+        </header>
+
+        <section class="content">
+            <h2>{{ user.first_name }}'s Lost Items</h2>
+            <p>Post tickets for items you've found, view your existing tickets, and manage their visibility with
+                ease.
+            </p>
+            <div class="tabs">
+                <button class="tab active"><a href=""></a>Items</button>
+            </div>
+            <!-- Lost Tickets Section -->
+            <div id="lost-tickets-section" class="tickets-section">
+                <h1>Lost Tickets</h1>
+                {% set lost_tickets = [] %}
+                {% if tickets %}
+                <div class="ticket-list">
+                    {% for ticket in tickets['tickets'] %}
+                    {% if ticket.lost and not ticket.claimed %}
+                    {% set _ = lost_tickets.append(ticket) %}
+                    <div class="ticket-card">
+                        <h3>{{ ticket.lost_item }}</h3>
+                        <p><i class="fas fa-map-marker-alt"></i> Location Lost: {{ ticket.location }}</p>
+                        <p><i class="fas fa-info-circle"></i> Description: {{ ticket.description }}</p>
+                        <p><i class="fas fa-calendar-alt"></i> Date Found: {{ ticket.date|format_datetime }}</p>
+                        <p><i class="fas fa-calendar-alt"></i> Date posted: {{ ticket.issue_date|format_datetime }}</p>
+                        <p><i class="fas fa-check-circle"></i> Status: <span id="status-{{ ticket._id }}">
+                            {{ "Active" if ticket.status else "Inactive" }}
+                        </span>
+                            <label class="switch">
+                                <input type="checkbox" id="toggle-{{ ticket._id }}"
+                                       {% if ticket.status %}checked{% endif %}
+                                       onchange="toggleStatus('{{ ticket._id }}')">
+                                <span class="slider round"></span>
+                            </label>
+                        </p>
+                        {% if ticket.photo_url %}
+                        <img src="{{ ticket.photo_url }}" alt="Photo of {{ ticket.lost_item }}"
+                             class="ticket-photo">
+                        {% endif %}
+                        <button class="delete-button" onclick="deleteTicket('{{ ticket._id }}')">Delete</button>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                {% if lost_tickets|length == 0 %}
+                <p class="no-tickets">No lost tickets found.</p>
+                {% endif %}
+            </div>
+            <button class="view-more" onclick="openFoundItemModal()">Create New Lost Item</button>
+        </section>
+    </main>
+
+    <!-- Found Item Modal -->
+    <div id="foundItemModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeFoundItemModal()">&times;</span>
+            <h2>Create Lost Item Ticket</h2>
+            <form id="foundItemForm" action="/ticket/create" method="POST" enctype="multipart/form-data">
+                <div style="display: none;">
+                    <label for="lost">Lost</label>
+                    <div>
+                        <input type="radio" id="lost_true" name="lost" value="True" required checked>
+                        <label for="lost_true">Yes</label>
+                        <input type="radio" id="lost_false" name="lost" value="False" required>
+                        <label for="lost_false">No</label>
+                    </div>
+                </div>
+
+                <label for="lost_item">Lost Item</label>
+                <input type="text" id="lost_item" name="lost_item" placeholder="Name of found item" required>
+
+                <label for="description">Description of Item</label>
+                <textarea id="description" name="description" required></textarea>
+
+                <label for="location_lost">Location Lost</label>
+                <input type="text" id="location_lost" name="location_lost" required>
+
+                <label for="datetime">Date and Time Found</label>
+                <input type="datetime-local" id="datetime" name="datetime" required>
+
+                <label for="photo">Item Photo</label>
+                <input type="file" id="photo" name="photo" accept="image/*" required>
+
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+    function openFoundItemModal() {
+        document.getElementById('foundItemModal').style.display = 'flex';
+    }
+
+    function closeFoundItemModal() {
+        document.getElementById('foundItemModal').style.display = 'none';
+    }
+
+    window.onload = function () {
+        const closeButtons = document.querySelectorAll('.close-btn');
+        const flashMessages = document.querySelectorAll('.flash');
+
+        // Add event listener for the close button
+        closeButtons.forEach((button, index) => {
+            button.addEventListener('click', function (event) {
+                const flashMessage = event.target.closest('.flash');
+                closeFlashMessage(flashMessage);
+            });
+
+            // Set timeout for each flash message
+            setTimeout(() => {
+                if (flashMessages[index]) {
+                    closeFlashMessage(flashMessages[index]);
+                }
+            }, 5000); // 5 seconds timeout
+        });
+    };
+
+    function closeFlashMessage(flashMessage) {
+        flashMessage.style.opacity = 0;  // Fade out the message
+        setTimeout(() => {
+            flashMessage.remove();  // Remove the message after fade-out
+        }, 500);  // Match the fade-out time
+    }
+
+    function toggleStatus(ticketId) {
+        const toggleElement = document.getElementById(`toggle-${ticketId}`);
+        const newStatus = toggleElement.checked;
+
+        fetch(`/ticket/status/${ticketId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ status: newStatus })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+                document.getElementById(`status-${ticketId}`).textContent = newStatus ? "Active" : "Inactive";
+                showFlashMessage('success', 'Ticket status updated successfully');
+            } else {
+                toggleElement.checked = !newStatus;
+                showFlashMessage('error', 'Failed to update status: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            toggleElement.checked = !newStatus;
+            showFlashMessage('error', 'An error occurred while updating the status.');
+        });
+    }
+
+    function showFlashMessage(category, message) {
+        const flashMessagesContainer = document.querySelector('.flash-messages');
+        const flashMessage = document.createElement('div');
+        flashMessage.className = `flash flash-${category}`;
+        flashMessage.innerHTML = `
+            <span class="close-btn" onclick="this.parentElement.style.display='none';">&times;</span>
+            ${message}
+        `;
+        flashMessagesContainer.appendChild(flashMessage);
+        setTimeout(() => {
+            flashMessage.style.opacity = 0;
+            setTimeout(() => flashMessage.remove(), 500);
+        }, 5000);
+    }
+
+    function deleteTicket(ticketId) {
+        if (confirm('Are you sure you want to delete this ticket?')) {
+            fetch(`/ticket/delete/${ticketId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                    showFlashMessage('success', 'Ticket deleted successfully');
+                } else {
+                    showFlashMessage('error', 'Failed to delete ticket: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showFlashMessage('error', 'An error occurred while deleting the ticket.');
+            });
+        }
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+/* Base Styling */
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1F64FF, #FF7F50);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+/* Content Styling */
+.content {
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 100%;
+    padding: 30px;
+    text-align: center;
+    color: #333;
+}
+
+/* Heading Styling */
+h1 {
+    font-size: 2.5rem;
+    color: #1F64FF;
+    margin-bottom: 0.5rem;
+}
+
+/* Tagline Styling */
+.tagline {
+    font-size: 1rem;
+    color: #666;
+    margin-bottom: 20px;
+}
+
+/* Form Container */
+.container {
+    margin: 20px 0;
+    text-align: left;
+}
+
+/* Label Styling */
+label {
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-top: 10px;
+    display: block;
+    color: #555;
+}
+
+/* Input Field Styling */
+input {
+    width: 100%;
+    height: 45px;
+    padding: 10px;
+    box-sizing: border-box;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    font-size: 1rem;
+    border: 1px solid #ddd;
+    margin-top: 5px;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+/* Input Focus Styling */
+input:focus {
+    border-color: #1F64FF;
+    box-shadow: 0px 4px 10px rgba(31, 100, 255, 0.2);
+    outline: none;
+}
+
+/* Button Styling */
+.button {
+    background: linear-gradient(135deg, #FF7F50, #FF3C70);
+    border: none;
+    padding: 12px;
+    margin-top: 20px;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffffff;
+    cursor: pointer;
+    box-shadow: 0px 4px 10px rgba(255, 60, 112, 0.3);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/* Button Hover Styling */
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0px 8px 20px rgba(255, 60, 112, 0.4);
+}
+
+/* Button Active Styling */
+.button:active {
+    transform: translateY(0);
+    box-shadow: 0px 4px 10px rgba(255, 60, 112, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 500px) {
+    .content {
+        padding: 20px;
+    }
+
+    input,
+    .button {
+        width: 100%;
+    }
+}
+
+/* Flash Message Styles */
+.flash-messages {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 300px;
+    z-index: 9999;
+}
+
+.flash {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #fff;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.5s ease-in-out;
+    position: relative; /* Make room for the close button */
+}
+
+.flash-success {
+    background-color: #4CAF50;
+}
+
+.flash-error {
+    background-color: #F44336;
+}
+
+.flash-info {
+    background-color: #2196F3;
+}
+
+.flash-warning {
+    background-color: #FF9800;
+}
+
+/* Cross Button Styling */
+.close-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 18px;
+    color: #fff;
+    cursor: pointer;
+    background: none;
+    border: none;
+}
+
+.close-btn:hover {
+    color: #ccc;
+}
